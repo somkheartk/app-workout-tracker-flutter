@@ -79,6 +79,10 @@ export class WorkoutPlansService implements OnModuleInit {
   }
 
   async remove(id: string): Promise<void> {
+    const plan = await this.workoutPlansRepository.findOne({ where: { id } });
+    if (!plan) {
+      throw new NotFoundException('Workout plan not found');
+    }
     await this.workoutPlansRepository.delete(id);
   }
 }
