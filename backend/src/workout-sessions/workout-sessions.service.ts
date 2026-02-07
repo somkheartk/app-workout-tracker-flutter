@@ -1,35 +1,33 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { InjectModel } from '@nestjs/mongoose';
+import { Model } from 'mongoose';
 import { WorkoutSession } from './workout-session.entity';
 import { CreateWorkoutSessionDto } from './dto/workout-session.dto';
 
 @Injectable()
 export class WorkoutSessionsService {
   constructor(
-    @InjectRepository(WorkoutSession)
-    private workoutSessionsRepository: Repository<WorkoutSession>,
+    @InjectModel(WorkoutSession.name)
+    private workoutSessionModel: Model<WorkoutSession>,
   ) {}
 
   async create(userId: string, createDto: CreateWorkoutSessionDto): Promise<WorkoutSession> {
-    const session = this.workoutSessionsRepository.create({
+    const session = new this.workoutSessionModel({
       ...createDto,
       userId,
     });
-    return this.workoutSessionsRepository.save(session);
+    return session.save();
   }
 
   async findAll(userId: string): Promise<WorkoutSession[]> {
-    return this.workoutSessionsRepository.find({
-      where: { userId },
-      order: { createdAt: 'DESC' },
-    });
+    return this.workoutSessionModel
+      .find({ userId })
+      .sort({ createdAt: -1 })
+      .exec();
   }
 
   async findOne(id: string, userId: string): Promise<WorkoutSession> {
-    const session = await this.workoutSessionsRepository.findOne({
-      where: { id, userId },
-    });
+    const session = await this.workoutSessionModel.findOne({ _id: id, userId }).exec();
     if (!session) {
       throw new NotFoundException('Workout session not found');
     }
@@ -57,7 +55,9 @@ export class WorkoutSessionsService {
   }
 
   async remove(id: string, userId: string): Promise<void> {
-    const session = await this.findOne(id, userId);
-    await this.workoutSessionsRepository.remove(session);
+    const session = await this.workoutSessionModel.findOneAndDelete({ _id: id, userId }).exec();
+    if (!session) {
+      throw new NotFoundException('Workout session not found');
+    }
   }
 }

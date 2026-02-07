@@ -1,14 +1,14 @@
 import { Injectable, NotFoundException, OnModuleInit } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { InjectModel } from '@nestjs/mongoose';
+import { Model } from 'mongoose';
 import { WorkoutPlan } from './workout-plan.entity';
 import { CreateWorkoutPlanDto } from './dto/workout-plan.dto';
 
 @Injectable()
 export class WorkoutPlansService implements OnModuleInit {
   constructor(
-    @InjectRepository(WorkoutPlan)
-    private workoutPlansRepository: Repository<WorkoutPlan>,
+    @InjectModel(WorkoutPlan.name)
+    private workoutPlanModel: Model<WorkoutPlan>,
   ) {}
 
   async onModuleInit() {
@@ -16,7 +16,7 @@ export class WorkoutPlansService implements OnModuleInit {
   }
 
   private async initializeDefaultPlans() {
-    const count = await this.workoutPlansRepository.count();
+    const count = await this.workoutPlanModel.countDocuments();
     if (count === 0) {
       const defaultPlans = [
         {
@@ -51,22 +51,22 @@ export class WorkoutPlansService implements OnModuleInit {
       ];
 
       for (const plan of defaultPlans) {
-        await this.workoutPlansRepository.save(plan);
+        await this.workoutPlanModel.create(plan);
       }
     }
   }
 
   async create(createWorkoutPlanDto: CreateWorkoutPlanDto): Promise<WorkoutPlan> {
-    const plan = this.workoutPlansRepository.create(createWorkoutPlanDto);
-    return this.workoutPlansRepository.save(plan);
+    const plan = new this.workoutPlanModel(createWorkoutPlanDto);
+    return plan.save();
   }
 
   async findAll(): Promise<WorkoutPlan[]> {
-    return this.workoutPlansRepository.find();
+    return this.workoutPlanModel.find().exec();
   }
 
   async findOne(id: string): Promise<WorkoutPlan> {
-    const plan = await this.workoutPlansRepository.findOne({ where: { id } });
+    const plan = await this.workoutPlanModel.findById(id).exec();
     if (!plan) {
       throw new NotFoundException('Workout plan not found');
     }
@@ -74,15 +74,17 @@ export class WorkoutPlansService implements OnModuleInit {
   }
 
   async update(id: string, updateDto: Partial<CreateWorkoutPlanDto>): Promise<WorkoutPlan> {
-    await this.workoutPlansRepository.update(id, updateDto);
-    return this.findOne(id);
-  }
-
-  async remove(id: string): Promise<void> {
-    const plan = await this.workoutPlansRepository.findOne({ where: { id } });
+    const plan = await this.workoutPlanModel.findByIdAndUpdate(id, updateDto, { new: true }).exec();
     if (!plan) {
       throw new NotFoundException('Workout plan not found');
     }
-    await this.workoutPlansRepository.delete(id);
+    return plan;
+  }
+
+  async remove(id: string): Promise<void> {
+    const plan = await this.workoutPlanModel.findByIdAndDelete(id).exec();
+    if (!plan) {
+      throw new NotFoundException('Workout plan not found');
+    }
   }
 }

@@ -1,22 +1,16 @@
-import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn } from 'typeorm';
+import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
+import { Document } from 'mongoose';
 
-@Entity('workout_plans')
-export class WorkoutPlan {
-  @PrimaryGeneratedColumn('uuid')
-  id: string;
-
-  @Column()
+@Schema({ timestamps: true })
+export class WorkoutPlan extends Document {
+  @Prop({ required: true })
   name: string;
 
-  @Column({ type: 'text', nullable: true })
+  @Prop()
   description: string;
 
-  @Column({ type: 'json' })
+  @Prop({ type: Array, required: true })
   exercises: any[];
-
-  @CreateDateColumn()
-  createdAt: Date;
-
-  @UpdateDateColumn()
-  updatedAt: Date;
 }
+
+export const WorkoutPlanSchema = SchemaFactory.createForClass(WorkoutPlan);

@@ -1,11 +1,11 @@
 import { Module } from '@nestjs/common';
-import { TypeOrmModule } from '@nestjs/typeorm';
+import { MongooseModule } from '@nestjs/mongoose';
 import { WorkoutSessionsService } from './workout-sessions.service';
 import { WorkoutSessionsController } from './workout-sessions.controller';
-import { WorkoutSession } from './workout-session.entity';
+import { WorkoutSession, WorkoutSessionSchema } from './workout-session.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([WorkoutSession])],
+  imports: [MongooseModule.forFeature([{ name: WorkoutSession.name, schema: WorkoutSessionSchema }])],
   controllers: [WorkoutSessionsController],
   providers: [WorkoutSessionsService],
   exports: [WorkoutSessionsService],
