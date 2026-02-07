@@ -1,5 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Document, Types } from 'mongoose';
+import { Document } from 'mongoose';
 
 @Schema({ timestamps: true })
 export class WorkoutSession extends Document {
@@ -18,8 +18,8 @@ export class WorkoutSession extends Document {
   @Prop({ required: true })
   duration: number; // in minutes
 
-  @Prop({ type: Types.ObjectId, ref: 'User', required: true })
-  userId: Types.ObjectId;
+  @Prop({ required: true })
+  userId: string;
 }
 
 export const WorkoutSessionSchema = SchemaFactory.createForClass(WorkoutSession);
