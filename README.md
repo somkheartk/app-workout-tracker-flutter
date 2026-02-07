@@ -45,7 +45,7 @@ A comprehensive Flutter application for tracking workouts with authentication, w
 
 ### Backend (NestJS)
 - **Framework**: NestJS
-- **Database**: PostgreSQL with TypeORM
+- **Database**: MongoDB with Mongoose
 - **Authentication**: JWT with Passport
 - **Validation**: class-validator
 - **Security**: bcrypt password hashing
@@ -93,7 +93,7 @@ A comprehensive Flutter application for tracking workouts with authentication, w
 - Flutter SDK (>=3.0.0)
 - Dart SDK
 - Node.js (>=16.0.0) - for backend
-- PostgreSQL (>=12.0) - for backend
+- MongoDB (>=4.4) - for backend
 
 ### Installation
 
@@ -132,12 +132,16 @@ npm install
 3. Configure environment:
 ```bash
 cp .env.example .env
-# Edit .env with your database credentials
+# Edit .env with your MongoDB URI
 ```
 
-4. Create PostgreSQL database:
+4. Start MongoDB:
 ```bash
-createdb workout_tracker
+# Using MongoDB service
+sudo systemctl start mongod
+
+# Or using Docker
+docker run -d -p 27017:27017 --name mongodb mongo:latest
 ```
 
 5. Run the backend:
