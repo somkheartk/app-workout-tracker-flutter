@@ -161,9 +161,14 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
                           showTitles: true,
                           reservedSize: 30,
                           getTitlesWidget: (value, meta) {
-                            const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
-                            if (value.toInt() >= 0 && value.toInt() < days.length) {
-                              return Text(days[value.toInt()]);
+                            // Calculate the actual day name based on current date
+                            final now = DateTime.now();
+                            final targetDate = now.subtract(Duration(days: 6 - value.toInt()));
+                            final dayNames = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+                            // DateTime.weekday returns 1 for Monday, 7 for Sunday
+                            final dayIndex = targetDate.weekday - 1;
+                            if (value.toInt() >= 0 && value.toInt() < 7) {
+                              return Text(dayNames[dayIndex]);
                             }
                             return const Text('');
                           },

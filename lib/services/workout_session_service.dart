@@ -42,10 +42,11 @@ class WorkoutSessionService {
 
   Future<WorkoutSession?> getActiveSession(String userId) async {
     final sessions = await getSessions(userId);
-    try {
-      return sessions.firstWhere((s) => !s.isCompleted);
-    } catch (e) {
-      return null;
+    for (var session in sessions) {
+      if (!session.isCompleted) {
+        return session;
+      }
     }
+    return null;
   }
 }

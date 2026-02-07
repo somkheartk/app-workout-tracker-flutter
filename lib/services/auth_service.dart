@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:crypto/crypto.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../models/user.dart';
 
@@ -6,14 +7,23 @@ class AuthService {
   static const String _userKey = 'current_user';
   static const String _usersKey = 'users';
 
+  // Hash password using SHA-256
+  String _hashPassword(String password) {
+    final bytes = utf8.encode(password);
+    final digest = sha256.convert(bytes);
+    return digest.toString();
+  }
+
   Future<User?> login(String email, String password) async {
     final prefs = await SharedPreferences.getInstance();
     final usersJson = prefs.getString(_usersKey);
     
     if (usersJson != null) {
       final List<dynamic> usersList = jsonDecode(usersJson);
+      final hashedPassword = _hashPassword(password);
+      
       for (var userJson in usersList) {
-        if (userJson['email'] == email && userJson['password'] == password) {
+        if (userJson['email'] == email && userJson['passwordHash'] == hashedPassword) {
           final user = User.fromJson(userJson);
           await _saveCurrentUser(user);
           return user;
@@ -40,10 +50,11 @@ class AuthService {
     
     final userId = DateTime.now().millisecondsSinceEpoch.toString();
     final user = User(id: userId, email: email, name: name);
+    final hashedPassword = _hashPassword(password);
     
     usersList.add({
       ...user.toJson(),
-      'password': password,
+      'passwordHash': hashedPassword,
     });
     
     await prefs.setString(_usersKey, jsonEncode(usersList));
