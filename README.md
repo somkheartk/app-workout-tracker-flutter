@@ -36,16 +36,25 @@ A comprehensive Flutter application for tracking workouts with authentication, w
 
 ## Technical Stack
 
+### Frontend (Flutter)
 - **Framework**: Flutter
 - **State Management**: Built-in StatefulWidget with Provider-ready architecture
 - **Local Storage**: SharedPreferences for data persistence
 - **Charts**: FL Chart for statistics visualization
 - **Date Formatting**: Intl package
 
+### Backend (NestJS)
+- **Framework**: NestJS
+- **Database**: PostgreSQL with TypeORM
+- **Authentication**: JWT with Passport
+- **Validation**: class-validator
+- **Security**: bcrypt password hashing
+
 ## Project Structure
 
 ```
-lib/
+.
+├── lib/                          # Flutter app source
 ├── main.dart                     # Application entry point
 ├── models/                       # Data models
 │   ├── user.dart
@@ -65,6 +74,17 @@ lib/
     ├── workout_tracker_screen.dart
     ├── statistics_screen.dart
     └── groups_screen.dart
+└── backend/                      # NestJS backend API
+    ├── src/
+    │   ├── auth/                 # Authentication module
+    │   ├── users/                # Users module
+    │   ├── workout-plans/        # Workout plans module
+    │   ├── workout-sessions/     # Sessions module
+    │   ├── groups/               # Groups module
+    │   ├── app.module.ts
+    │   └── main.ts
+    ├── package.json
+    └── README.md                 # Backend documentation
 ```
 
 ## Getting Started
@@ -72,8 +92,12 @@ lib/
 ### Prerequisites
 - Flutter SDK (>=3.0.0)
 - Dart SDK
+- Node.js (>=16.0.0) - for backend
+- PostgreSQL (>=12.0) - for backend
 
 ### Installation
+
+#### Flutter App
 
 1. Clone the repository:
 ```bash
@@ -90,6 +114,38 @@ flutter pub get
 ```bash
 flutter run
 ```
+
+#### Backend API (Optional)
+
+The app works with local storage by default, but you can optionally set up the backend:
+
+1. Navigate to backend directory:
+```bash
+cd backend
+```
+
+2. Install dependencies:
+```bash
+npm install
+```
+
+3. Configure environment:
+```bash
+cp .env.example .env
+# Edit .env with your database credentials
+```
+
+4. Create PostgreSQL database:
+```bash
+createdb workout_tracker
+```
+
+5. Run the backend:
+```bash
+npm run start:dev
+```
+
+See [backend/README.md](backend/README.md) for detailed API documentation.
 
 ## Usage
 
