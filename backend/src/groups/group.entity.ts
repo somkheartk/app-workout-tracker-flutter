@@ -1,28 +1,22 @@
-import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn } from 'typeorm';
+import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
+import { Document } from 'mongoose';
 
-@Entity('groups')
-export class Group {
-  @PrimaryGeneratedColumn('uuid')
-  id: string;
-
-  @Column()
+@Schema({ timestamps: true })
+export class Group extends Document {
+  @Prop({ required: true })
   name: string;
 
-  @Column({ type: 'text', nullable: true })
+  @Prop()
   description: string;
 
-  @Column()
+  @Prop({ required: true })
   adminId: string;
 
-  @Column('simple-array')
+  @Prop({ type: [String], default: [] })
   memberIds: string[];
 
-  @Column({ type: 'json', default: [] })
+  @Prop({ type: Array, default: [] })
   activities: any[];
-
-  @CreateDateColumn()
-  createdAt: Date;
-
-  @UpdateDateColumn()
-  updatedAt: Date;
 }
+
+export const GroupSchema = SchemaFactory.createForClass(Group);

@@ -10,7 +10,8 @@ export class UsersController {
   @Get('profile')
   async getProfile(@Request() req) {
     const user = await this.usersService.findOne(req.user.userId);
-    const { password, ...result } = user;
+    const userObj = user.toObject();
+    const { password, ...result } = userObj;
     return result;
   }
 
@@ -19,7 +20,8 @@ export class UsersController {
   async findAll() {
     const users = await this.usersService.findAll();
     return users.map(user => {
-      const { password, ...result } = user;
+      const userObj = user.toObject();
+      const { password, ...result } = userObj;
       return result;
     });
   }

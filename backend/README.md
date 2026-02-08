@@ -9,14 +9,14 @@ NestJS backend API for the Workout Tracker Flutter application.
 - **Workout Plans**: CRUD operations for workout plans with default templates
 - **Workout Sessions**: Track completed workout sessions with statistics
 - **Groups**: Create and manage workout groups with activity tracking
-- **PostgreSQL Database**: TypeORM integration for data persistence
+- **MongoDB Database**: Mongoose integration for data persistence
 - **Validation**: Built-in request validation using class-validator
 - **CORS**: Configured for Flutter app integration
 
 ## Tech Stack
 
 - **Framework**: NestJS
-- **Database**: PostgreSQL with TypeORM
+- **Database**: MongoDB with Mongoose
 - **Authentication**: JWT (JSON Web Tokens) with Passport
 - **Validation**: class-validator and class-transformer
 - **Security**: bcrypt for password hashing
@@ -24,7 +24,7 @@ NestJS backend API for the Workout Tracker Flutter application.
 ## Prerequisites
 
 - Node.js (v16 or higher)
-- PostgreSQL (v12 or higher)
+- MongoDB (v4.4 or higher)
 - npm or yarn
 
 ## Installation
@@ -45,22 +45,19 @@ cp .env.example .env
 PORT=3000
 NODE_ENV=development
 
-DB_TYPE=postgres
-DB_HOST=localhost
-DB_PORT=5432
-DB_USERNAME=postgres
-DB_PASSWORD=postgres
-DB_DATABASE=workout_tracker
+MONGODB_URI=mongodb://localhost:27017/workout_tracker
 
 JWT_SECRET=your-secret-key-change-in-production
 JWT_EXPIRES_IN=7d
 ```
 
-4. Create the PostgreSQL database:
+4. Start MongoDB:
 ```bash
-psql -U postgres
-CREATE DATABASE workout_tracker;
-\q
+# Using MongoDB service
+sudo systemctl start mongod
+
+# Or using Docker
+docker run -d -p 27017:27017 --name mongodb mongo:latest
 ```
 
 ## Running the Application
@@ -307,41 +304,42 @@ The API automatically creates three default workout plans on first run:
 
 ## Database Schema
 
-### Users Table
-- `id`: UUID (Primary Key)
-- `email`: String (Unique)
-- `name`: String
-- `password`: String (Hashed)
-- `createdAt`: Timestamp
-- `updatedAt`: Timestamp
+### Users Collection
+- `_id`: ObjectId (Primary Key)
+- `email`: String (Unique, Required)
+- `name`: String (Required)
+- `password`: String (Required, Hashed)
+- `createdAt`: Timestamp (Auto-generated)
+- `updatedAt`: Timestamp (Auto-generated)
 
-### Workout Plans Table
-- `id`: UUID (Primary Key)
-- `name`: String
-- `description`: Text
-- `exercises`: JSON
-- `createdAt`: Timestamp
-- `updatedAt`: Timestamp
+### Workout Plans Collection
+- `_id`: ObjectId (Primary Key)
+- `name`: String (Required)
+- `description`: String
+- `exercises`: Array (Required)
+- `createdAt`: Timestamp (Auto-generated)
+- `updatedAt`: Timestamp (Auto-generated)
 
-### Workout Sessions Table
-- `id`: UUID (Primary Key)
-- `planName`: String
-- `completedExercises`: JSON
-- `startTime`: Timestamp
-- `endTime`: Timestamp
-- `duration`: Integer
-- `userId`: UUID (Foreign Key)
-- `createdAt`: Timestamp
+### Workout Sessions Collection
+- `_id`: ObjectId (Primary Key)
+- `planName`: String (Required)
+- `completedExercises`: Array (Required)
+- `startTime`: Date (Required)
+- `endTime`: Date (Required)
+- `duration`: Number (Required)
+- `userId`: ObjectId (Reference to Users, Required)
+- `createdAt`: Timestamp (Auto-generated)
+- `updatedAt`: Timestamp (Auto-generated)
 
-### Groups Table
-- `id`: UUID (Primary Key)
-- `name`: String
-- `description`: Text
-- `adminId`: UUID
-- `memberIds`: Array
-- `activities`: JSON
-- `createdAt`: Timestamp
-- `updatedAt`: Timestamp
+### Groups Collection
+- `_id`: ObjectId (Primary Key)
+- `name`: String (Required)
+- `description`: String
+- `adminId`: String (Required)
+- `memberIds`: Array of Strings
+- `activities`: Array
+- `createdAt`: Timestamp (Auto-generated)
+- `updatedAt`: Timestamp (Auto-generated)
 
 ## Project Structure
 
@@ -440,9 +438,9 @@ class ApiService {
 ## Troubleshooting
 
 ### Database Connection Issues
-- Ensure PostgreSQL is running
-- Verify database credentials in `.env`
-- Check if the database exists
+- Ensure MongoDB is running
+- Verify MONGODB_URI in `.env`
+- Check if MongoDB is accessible on the specified port
 
 ### Port Already in Use
 - Change the PORT in `.env` file

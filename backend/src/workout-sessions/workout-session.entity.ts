@@ -1,33 +1,25 @@
-import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, ManyToOne, JoinColumn } from 'typeorm';
-import { User } from '../users/user.entity';
+import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
+import { Document } from 'mongoose';
 
-@Entity('workout_sessions')
-export class WorkoutSession {
-  @PrimaryGeneratedColumn('uuid')
-  id: string;
-
-  @Column()
+@Schema({ timestamps: true })
+export class WorkoutSession extends Document {
+  @Prop({ required: true })
   planName: string;
 
-  @Column({ type: 'json' })
+  @Prop({ type: Array, required: true })
   completedExercises: any[];
 
-  @Column()
+  @Prop({ required: true })
   startTime: Date;
 
-  @Column()
+  @Prop({ required: true })
   endTime: Date;
 
-  @Column()
+  @Prop({ required: true })
   duration: number; // in minutes
 
-  @ManyToOne(() => User, user => user.sessions)
-  @JoinColumn({ name: 'userId' })
-  user: User;
-
-  @Column()
+  @Prop({ required: true })
   userId: string;
-
-  @CreateDateColumn()
-  createdAt: Date;
 }
+
+export const WorkoutSessionSchema = SchemaFactory.createForClass(WorkoutSession);

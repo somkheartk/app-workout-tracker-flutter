@@ -1,26 +1,16 @@
-import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn, OneToMany } from 'typeorm';
-import { WorkoutSession } from '../workout-sessions/workout-session.entity';
+import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
+import { Document } from 'mongoose';
 
-@Entity('users')
-export class User {
-  @PrimaryGeneratedColumn('uuid')
-  id: string;
-
-  @Column({ unique: true })
+@Schema({ timestamps: true })
+export class User extends Document {
+  @Prop({ required: true, unique: true })
   email: string;
 
-  @Column()
+  @Prop({ required: true })
   name: string;
 
-  @Column()
+  @Prop({ required: true })
   password: string;
-
-  @OneToMany(() => WorkoutSession, session => session.user)
-  sessions: WorkoutSession[];
-
-  @CreateDateColumn()
-  createdAt: Date;
-
-  @UpdateDateColumn()
-  updatedAt: Date;
 }
+
+export const UserSchema = SchemaFactory.createForClass(User);
